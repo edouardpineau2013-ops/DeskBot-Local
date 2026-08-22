@@ -1,0 +1,360 @@
+### Page 1
+
+1) L'intestin grêle est délimité par la paroi. Dans l'intestin, il y a les villosités intestinales où passe le sang et se charge en nutriments, qui sont contenus dans la cavité de l'intestin grêle.
+
+2) Dans le sang sortant il y a : entre 0,4 g/L et 0,7 g/L de glucides en plus, 0,25 g/L de lipides en plus, 0,2 g/L de protéines en plus, 2 mg/L de vitamines en plus, 15 mL/L d'eau en plus et 0,5 g/L de sels minéraux en plus.
+
+3) Ce sont les nutriments contenus dans la cavité de l'intestin grêle.
+
+4) Je pense que l'avantage d'avoir des villosités est que le sang peut circuler à plus d'endroits, et donc se charge plus rapidement en nutriments.
+
+**Bilan :** La paroi de l'intestin grêle présente de nombreux replis appelés villosités qui augmentent fortement la surface de contact avec les nutriments issus de la digestion. Le très nombreux vaisseaux sanguins situés dans les villosités permettent aux nutriments de passer dans le sang : c'est l'absorption. L'ensemble constitue une surface d'échange.
+
+[Schéma d'une villosité intestinale]
+* Légendes :
+  * absorption des nutriments
+  * villosité
+  * vaisseau sanguin
+
+**Titre :** schéma de l'absorption des nutriments par villosité intestinale
+
+---
+
+### Page 2
+
+#### [Partie gauche]
+
+**⑤ Observations :**
+
+**Courbe 1 :** On peut diviser la courbe en trois parties : dans la première partie, la température diminue en passant de 15°C à -12,0°C en 7 min. Dans la deuxième partie, la température stagne à -12,0°C pendant 6 min. Dans la troisième partie, la température diminue en passant de -12,0°C à -13,5°C en 2 min.
+
+**Courbe 2 :** On peut diviser la courbe en trois parties : dans la première partie, la température diminue en passant de 16°C à -2°C en 9 min. Dans la deuxième partie, la température diminue en passant de -2°C à -7°C en 3 min 30 s. Dans la troisième partie, la température diminue en passant de -7°C à -10°C en 2 min.
+
+**⑥ Conclusion :**
+
+J'en conclus que le liquide lave-glace se solidifie à une température proche de -12°C.
+
+**Calcul :**
+100 % $\rightarrow$ -12,0°C
+5 % $\rightarrow$ ?
+
+$? = 5 \times (-12,0\text{°C}) / 100 = -0,6\text{°C}$
+
+Il est donc conseillé d'utiliser mon liquide lave-glace pour des températures supérieures à -0,6°C.
+
+---
+
+#### [Partie centrale]
+
+**Manipulation n°5 : Le caddie de Sophie**
+
+* Masse du film plastique recouvrant le pack de bouteilles : 12,1 g
+* Masse d'une bouteille en plastique vide (bouchon compris) : 27,3 g
+
+*Document n°1 : Quelques masses fournies par l'Etude*
+
+*Image : Pack de Volvic 6x1.5L*
+*Document n°2 : Photo du pack de Sophie*
+
+*Image : Consigne de caisse*
+"En caisse, les produits pesant plus de 8 kg restent dans le caddie."
+*Document n°3 : Etiquette présente à la caisse du supermarché*
+
+Sophie arrive en caisse avec le pack d'eau représenté sur le document n°2. En déchargeant son caddie, elle aperçoit l'étiquette du document n°3 et se demande si son pack d'eau doit rester dans le caddie. Qu'en penses-tu ?
+
+---
+
+#### [Partie droite]
+
+**④ Observations :**
+
+J'observe que :
+250 ml d'eau = 250 g
+Donc 1000 ml d'eau = 1000 g
+Donc 1 L d'eau = 1000 g = 1 kg
+$\rightarrow$ 9 L ($6 \times 1,5$) d'eau = 9 kg
+
+À la masse de l'eau, nous devons ajouter la masse du plastique :
+
+$\text{Masse totale} = 9000\text{ g} + (27,3 \times 6) + 12,1\text{ g}$
+$= 9175,9\text{ g} = 9,1\text{ kg}$
+
+**⑤ Conclusion :**
+
+J'en conclus que la masse totale du pack d'eau est égale à 9,1 kg. Cette masse est supérieure à 8 kg. Sophie doit donc laisser son pack d'eau dans le caddie.
+
+---
+
+### Page 3
+
+ASTERIX HEROS NOSTER EST, QUI SUBIT HAEC PERICULA. EI VIRO BREVI STATURA INGENIOQUE CALLIDO OMNIA PERICULOSA MANDATA SINE ULLA DUBITATIONE COMMITTUNTUR. VIR VIRES SUPRA HUMANAM EX POTIONE MAGICA PANORAMIXIS DRUIDAE TRAHIT.
+
+OBELIX INSEPARABILIS ASTERIGIS AMICUS EST. MUNUS EIUS EST INGENTES CIPPOS COMPORTARE. VALDE AMAT CARNEM APRORUM. OBELIX SEMPER PARATUS EST OMNIA EX MANIBUS DEMITTERE, UT ASTERIGEM AD NOVUM PERICULUM SUBEUNDUM SEQUATUR, DUMMODO APRI ET ACERRIMAE RIXAE APPAREANT.
+
+PANORAMIX, VENERABILIS VICI DRUIDA, VISCUM SECAT POTIONESQUE MAGICAS MISCET. IMPRIMIS POTIO QUAEDAM, QUAE VIRES INCREDIBILES TRIBUIT, POPULARISSIMA EST ATQUE GRATISSIMA VICANIS. AT PANORAMIGI ETIAM ALIORUM POTUUM PRAECEPTA SUNT...
+
+CANTORIX BARDUS EST. IUDICIA DE EIUS INDOLE DIVERSA SUNT: IPSE SE INGENIOSUM IUDICAT, OMNES CETERI CANTUS EIUS INCREDIBILES ESSE SENTIUNT, AT CUM NIHIL DICIT, SODALIS HILARIS ATQUE ALACER EST, AB OMNIBUS MAGNI AESTIMATUS.
+
+MAJESTIX POSTREMO PRINCEPS CIVITATIS EST, AUCTORITATE VESTITUS, FORTISSIMUS, SUSPICIOSUS HOMO REI MILITARIS PERITISSIMUS, A SUIS COLITUR, TIMETUR AUTEM AB HOSTIBUS. MAJESTIX NIHIL TIMET NISI HOC UNUM: NE CAELUM IN CAPUT CADAT. AT UT IPSE DICIT: "NONDUM OMNIUM DIERUM SOL OCCIDIT."
+
+---
+
+### Page 4
+
+**VOCAB :**
+* I think / I guess / I suppose
+* To chat = discuter, bavarder
+* To buy = acheter
+
+Monday, December 1st (the first)
+
+**AP : LE PRETERIT SIMPLE**
+
+Pour raconter une histoire au passé ou pour reporter des faits révolus, j'utilise le preterit simple.
+
+* **forme affirmative :** je rajoute "-ed" à l'infinitif du verbe.
+  * *Ex :* I played football yesterday.
+
+* **forme négative :** j'utilise l'auxiliaire $\text{DID} + \text{NOT}$ (= didn't) + infinitif du verbe.
+  * *Ex :* I didn't play tennis yesterday.
+
+▲
+* Certains verbes sont irréguliers, il faut les apprendre par coeur.
+* La forme preterite est la même à toutes les personnes, sauf avec "be".
+
+**TO BE AU PRETERIT SIMPLE**
+
+| Affirmatif | Négatif |
+| :--- | :--- |
+| I was | wasn't |
+| You were | weren't |
+| He/She/It was | wasn't |
+| We were | weren't |
+| They were | weren't |
+
+a) My sister didn't revise, so she got a bad mark.
+b) I climbed in a tree yesterday and I broke my arm.
+c) I didn't sleep very well last night, I'm tired.
+d) She didn't call her brother yesterday, so now he is angry.
+e) I needed the car yesterday, not today !
+
+---
+
+### Page 5
+
+Before I go to school I waked up and I did my breakfast. When my breakfast is ready, I eated it. Then, I brushed my teeth and I dressed quickly. Next, I checked I have all my notebooks. Finally, I goed to school.
+
+Tuesday, December 2nd (the second)
+
+Before I go to school, I have breakfast, I brush my teeth, I check Pronote on my phone and make sure I have all my copy books.
+
+**LES ADVERBES**
+
+**Observe ces phrases :**
+1. I [usually] stop by the shop on my way to school.
+2. I'm [often] late.
+3. [Sometimes] it's because we get distracted.
+4. Rolled out of bed (slowly).
+
+* Encadre les adverbes dans les phrases 1, 2 et 3.
+* Souligne ce sur quoi ils portent.
+
+En anglais, l'adverbe se place généralement **avant** le mot ou le groupe de mots sur lequel il porte. (phrases 1, 2, 3)
+
+* Dans la phrase 4, le recours à des parenthèses permet de placer l'adverbe en fin de phrase. Réécris la phrase en intégrant l'adverbe. Tu peux t'inspirer de la phrase 1 :
+  * *I slowly rolled out of bed.*
+
+* Observe l'adverbe de la phrase 1 et celui de la phrase 4.
+  * Qu'ont-ils en commun ? *ils se terminent en -ly.*
+  * Lequel donne une indication sur la fréquence ? *usually*
+  * Lequel donne une indication sur la manière ? *slowly*
+
+| adverbes de fréquence | adverbes de manières |
+| :--- | :--- |
+| often | rapidly |
+| always | nicely |
+| occasionally | stupidly |
+| never | angrily |
+| rarely | |
+
+---
+
+### Page 6
+
+#### [Partie supérieure / Exercices de fractions]
+
+**Exercice 45 page 151**
+* a) $3 \times \dots = 33$ ; $33 / 3 = 11$ ; 11 est le nombre manquant.
+* b) $12 \times \dots = 36$ ; $36 / 12 = 3$ ; 3 est le nombre manquant.
+* c) $8 \times \dots = 3$ ; $3 / 8 = 0,375$ ; 3/8 ou 0,375 est le nombre manquant.
+* d) $5 \times \dots = 2$ ; $2 / 5 = 0,4$ ; 2/5 ou 0,4 est le nombre manquant.
+* e) $4 \times \dots = 10$ ; $10 / 4 = 2,5$ ; 2,5 ou 10/4 est le nombre manquant.
+* f) $6 \times \dots = 3$ ; $3 / 6 = 0,5$ ; 3/6 ou 0,5 est le nombre manquant.
+
+**Exercice 49 page 151**
+* a) $5 \times \dots = 13$ ; 13/5
+* b) $19 \times \dots = 2$ ; 2/19
+* c) $7 \times \dots = 11$ ; 11/7
+* d) $\dots \times 12 = 13$ ; 13/12
+
+**Exercice 51 page 151**
+* a) $4 \times 5/4 = 5$
+* b) $13 \times 7/13 = 7$
+* c) $7 \times 5/7 = 5$
+* d) $8 \times 11/8 = 11$
+
+**Exercice 11 page 131**
+* a) $15 \times 4 = 60$ et $60 : 10 = 6$. Il y a 6 tablettes de chocolat noir.
+* b) $15 \times 2 = 30$ et $30 : 10 = 3$. Il y a 3 tablettes de chocolat blanc.
+* c) $15 \times 4/10 = 6$ et $15 \times 2/10 = 3$. Il y a $15 - (6 + 3) = 15 - 9 = 6$. Il y a 6 tablettes de chocolat au lait.
+
+---
+
+#### [Partie inférieure / Géométrie - Aires]
+
+**Calculer des aires**
+
+**Une figure, deux aires ?**
+
+[Schémas des figures F et G sur quadrillage]
+
+En dénombrant, l'aire de F est de 16 carreaux, et celle de G de 14 carreaux. L'aire dépend de l'unité choisie.
+
+| en prenant | l'aire de F est de... | l'aire de G est de... |
+| :--- | :--- | :--- |
+| un carreau | 16 u | 14 u |
+| un triangle (la moitié d'un carreau) | 32 t | 28 t |
+| un rectangle (de 2 carreaux) | 8 r | 7 r |
+| un grand carreau (de 4 carreaux) | 4 g | 3,5 g |
+
+Pour mesurer la superficie des terrains ou des habitations, l'unité de base est le m².
+1 m² = aire d'un carré de 1 m de côté.
+
+Chaque unité d'aire est 100 fois plus grande que celle du rang immédiatement inférieur.
+
+| km² | hm² | dam² | m² | dm² | cm² | mm² |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| | | | 1 | 0 0 | 0 0 | 0 0 |
+
+* $1\text{ m}² = 100\text{ dm}² = 10\ 000\text{ cm}² = 1\ 000\text{000}\text{ mm}²$
+* $1\text{ cm}² = 100\text{ mm}²$
+* $1\text{ dm}² = 100\text{ cm}²$
+
+* Aire d'un carré de côté c : $c \times c$
+
+---
+
+### Page 7
+
+**Dok 10 Was magst du an (+ datif) : ...**
+
+Weihnachten / Ostern / dem Laternenzug / dem ersten Schultag in der Grundschule (école primaire) / dem Nationalfeiertag Deutschlands / dem Oktoberfest / dem Valentinstag / dem Fussballsieg ( der Sieg = victoire) / dem Karneval / dem Sommerbeginn (début de l'été) / dem Neujahr
+
+**MÖGEN :** ich mag, du magst, er mag, wir mögen, ihr mögt, sie mögen
+
+**A/ Finde den Wortschatz und nummeriere die Bilder :**
+
+**B/ Partnerarbeit :**
+
+* Bulle 1 : Was magst du an ... ?
+* Bulle 2 : Fragt euch zu zweit, was ihr an bestimmten Feiertagen mögt.
+* Note manuscrite : Que veut dire « mag » à ton avis ? *apprécier*
+* Bulle 3 : Was magst du an Ostern?
+* Bulle 4 : An Ostern mag ich Ostereier suchen.
+
+[Bilder mit Nummern]
+* Top row: (11), (4), (7), (1), (6)
+* Middle row: (13) (Eis essen), (5), (3), (12), (10)
+* Bottom row: (15), (14) (Ich liebe dich!!!), (16), (2)
+
+1/ Schokoladen schenken
+2/ Freunde treffen
+3/ sich als Pirat oder Clown verkleiden
+4/ Laternen basteln
+5/ Geschenke verteilen
+6/ das Feuerwerk sehen *(manuscrit: feux)*
+7/ Plätzchen backen
+8/ Ostereier finden (trouver)
+9/ das Brandenburger Tor sehen
+10/ den Maibaum sehen
+11/ Weihnachtslieder singen *(manuscrit: lieder = singen)*
+12/ auf den Weihnachtsmarkt gehen
+13/ viel essen (manger beaucoup)
+14/ einen Liebesbrief bekommen (recevoir)
+15/ eine Schultüte mit Überraschungen und Schokoladen bekommen
+16/ eine Brezel und ein Lebkuchenherz (cœur en pain d'épices) essen
+
+* Note manuscrite à gauche : *eine gute Stimmung = ambiance*
+
+**Was ist dein Lieblingsfest?** An Weihnachten mag ich Geschenke bekommen und Familie treffen, weil es ist Weihnachten.
+
+---
+
+### Page 8
+
+**Dok 11 MEIN GEBURTSTAG**
+
+**I/ Wie alt bist du ?**
+$\rightarrow$ Schreib den Namen von den Kindern unter dem Portrait (attention, certains chiffres sont erronés)
+**Remarque :** comment indique-t-on l'âge qu'on va avoir :
+
+* Lies und schreib den passenden Vornamen unter jedes Bild
+* Sophia feiert heute Geburtstag. Er ist zehn (barré, corrigé par "Ina"?)
+* Kim hat im Mai Geburtstag. Sie wird neun
+* Sona ist elf Jahre alt
+* Thomas wird acht im Dezember
+* Valentin ist vier Jahre alt
+
+[Portraits]
+1. Valentin
+2. Sacha
+3. Ina
+4. Thomas
+5. Sara
+
+* Ich habe heute Geburtstag!
+* $\rightarrow$ Schön ! Wie alt wirst du ?
+* $\rightarrow$ ich werde 12 (Jahre alt) heute
+
+**Conjugaison de WERDEN =**
+* ich werde
+* Du wirst *(manuscrit: auxiliaire du futur)*
+* Er/sie wird
+* Wir werden
+* Ihr werdet
+* sie/Sie werden
+
+**II/ CO Maries Geburtstag :**
+**Training : CO : Was ist der Vorname und das Alter von den Kindern ?**
+Es sind Freunde. Das Mädchen hat Geburtstag. Es ist eine Geburtstagsparty. Die Jungen und die Mädchen sind eingeladen *(manuscrit: invités)*. Es gibt Geschenke und einen Kuchen zum Geburtstag.
+
+**Vokabeln :** der Freund (e) / die Freundin (nen) | das Mädchen (-) | der Junge (n) | die Party | Der Geburtstag (e) | es gibt = il y a | eingeladen = invité | das Geschenk (e) = cadeau | der Kuchen (-) = gateau
+« Zum Geburtstag viel Glück ! »
+
+| Vorname | Alter |
+| :--- | :--- |
+| **Freund A** Lukas | er ist 14 |
+| **Freund B** Lina | sie ist 13 |
+| **Freund C** Max | er ist 13 |
+| **Freund D** Marie | sie ist 14 |
+
+**III/ A/ Was ist dein Geburtsdatum ? Kettenspiel (en chaine, 4 questions/ réponses différentes)**
+1/ Wann ist dein Geburtstag ? = 2/ Was ist dein Geburtstagsdatum ? = 3/ Wann hast du Geburtstag ? = 4/ Wann bist du geboren ?
+
+Schüler 1 : Wann ist dein Geburtstag ? $\rightarrow$ Schüler 2 : Mein Geburtstag ist am **15. MÄRZ**
+Schüler 2 : Was ist dein Geburtsdatum ? Schüler 3 : Mein Geburtsdatum ist der ...
+Schüler 3 : Wann hast du Geburtstag ? Schüler 4 : Ich habe Geburtstag am ...
+Schüler 4 : Wann bist du geboren ? Schüler 5 : ich bin am .... geboren.
+
+**B/ Was wünschst du dir zum Geburtstag ? Nummeriere die Bilder + schreib den richtigen Artikel**
+
+1. Ich wünsche mir **einen** neuen Pullover. | der Pullover (er)
+2. Wünschst du dir **eine** Uhr? | die Uhr (en)
+3. Ich wünsche mir **ein** Fahrrad und **X** Inlineskater. | das Fahrrad (er) \| der Inlineskater (e)
+4. Was wünschst du dir? **X** Schier oder **ein** Snowboard? | der Ski (er) \| das Snowboard (s)
+5. Ich wünsche mir **einen** Fußball oder **ein** Spiel. | der Fußball (e) \| das Spiel (e)
+6. Ich wünsche mir **einen** Hund oder **eine** Katze. | der Hund (e) \| die Katze (n)
+7. Wünschst du dir **X** Bücher oder **einen** Gameboy? | das Buch (er) \| der Gameboy (s)
+8. Meine Schwester wünscht sich **ein** Pferd. | das Pferd (e)
+9. Mein Bruder wünscht sich **einen** Teddybären. | der Teddybär (en)
+10. Ich wünsche mir **X** Ohrringe. | der Ohrring (e)

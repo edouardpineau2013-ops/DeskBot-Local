@@ -1,0 +1,30 @@
+Le coefficient de proportionnalité est 1,4. Cela signifie que 1 macaron coûte 1,4 €.
+
+2) Calculer une quatrième proportionnelle
+
+Définition:
+
+C'est la quatrième valeur dans un tableau à 4 cases dans lequel trois valeurs sont connues.
+
+| Masse (en kg) | 4 | 5 |
+| :--- | :---: | :---: |
+| Prix (en €) | 11,20 | $x$ |
+
+$\frac{11,20}{4} = 2,8$
+
+$x = 5 \times 2,8 = 14$
+
+3) Calculer un pourcentage
+
+- Appliquer un pourcentage: Soit N un nombre et p un pourcentage, appliquer p % à N, c'est calculer: $\frac{N \times p}{100}$
+Exemple: Dans un collège de 460 élèves, il y a 55 % de filles. Calculer le nombre de filles et de garçons.
+Nombre de filles = $\frac{460 \times 55}{100} = 253$ filles ;
+Nombre de garçons = $\frac{460 \times 45}{100} = 207$ garçons.
+
+- Recherche un pourcentage: c'est déterminer le rapport sous la forme d'une fraction ayant 100 pour dénominateur.
+Exemple: Un pot de yaourt de 250 g contient 120 g de fruits. Quel est le pourcentage de la masse de fruits de ce pot de yaourt ?
+Le pourcentage de fruits de ce pot est : $\frac{120 \times 100}{250} = 48 \%$
+
+4) Échelle d'un plan.
+
+Définition:

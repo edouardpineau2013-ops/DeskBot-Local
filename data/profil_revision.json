@@ -1,0 +1,15 @@
+{
+  "points": 0,
+  "collection": {
+    "Prof d'Anglais": "commun"
+  },
+  "stats_matieres": {
+    "OCR": {
+      "correctes": 118,
+      "tentatives": 167
+    }
+  },
+  "serie": 1,
+  "record_serie": 2,
+  "derniere_revision": "2026-08-16"
+}

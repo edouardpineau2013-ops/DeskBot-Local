@@ -1,0 +1,56 @@
+{
+  "college": {
+    "nom_affiche": "Collège",
+    "chapitres": {
+      "resultat_des_menus": {
+        "nom_affiche": "Résultat des menus",
+        "chemin": "data/cours\\college\\resultat_des_menus.txt"
+      }
+    }
+  },
+  "test": {
+    "nom_affiche": "Test",
+    "chapitres": {
+      "test": {
+        "nom_affiche": "test",
+        "chemin": "data/cours\\test\\test.txt"
+      }
+    }
+  },
+  "ocr": {
+    "nom_affiche": "OCR",
+    "chapitres": {
+      "ocr": {
+        "nom_affiche": "OCR",
+        "chemin": "data/cours\\ocr\\ocr.txt"
+      }
+    }
+  },
+  "ocr_2": {
+    "nom_affiche": "OCR 2",
+    "chapitres": {
+      "ocr_2": {
+        "nom_affiche": "OCR 2",
+        "chemin": "data/cours\\ocr_2\\ocr_2.txt"
+      }
+    }
+  },
+  "latin": {
+    "nom_affiche": "Latin",
+    "chapitres": {
+      "asterix_et_obelix": {
+        "nom_affiche": "Astérix et Obélix",
+        "chemin": "data/cours\\latin\\asterix_et_obelix.txt"
+      }
+    }
+  },
+  "texte_de_maman": {
+    "nom_affiche": "Texte de maman",
+    "chapitres": {
+      "texte_de_maman": {
+        "nom_affiche": "Texte de maman",
+        "chemin": "data/cours\\texte_de_maman\\texte_de_maman.txt"
+      }
+    }
+  }
+}
