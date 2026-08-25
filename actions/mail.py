@@ -2,6 +2,8 @@ import os
 import json
 import threading
 import time
+from email.mime.text import MIMEText
+import base64
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -10,7 +12,10 @@ from googleapiclient.discovery import build
 
 from audio.voix import parler, notifier_telephone
 
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+SCOPES = [
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.send"
+]
 
 FICHIER_VUS = "data/mails_vus.json"
 
@@ -144,7 +149,7 @@ def _boucle_mails(intervalle_secondes=180):
             for expediteur, sujet in nouveaux:
                 message = f"Nouveau mail de {expediteur} : {sujet}"
                 parler(message)
-                notifier_telephone("📧 DeskBot", message)
+                notifier_telephone("DeskBot", message)
         except Exception as e:
             print("Erreur vérification mails :", e)
 
@@ -159,3 +164,30 @@ def lancer_gestionnaire_mails():
     thread.start()
     gestionnaire_mails_lance = True
     print("📧 Gestionnaire Mails lancé.")
+
+def envoyer_mail(destinataire, sujet, contenu):
+    """Envoie un mail via Gmail."""
+
+    service = _obtenir_service()
+
+    if service is None:
+        raise Exception("Impossible de se connecter à Gmail.")
+
+    message = MIMEText(contenu, "plain", "utf-8")
+    message["to"] = destinataire
+    message["subject"] = sujet
+
+    message_encode = base64.urlsafe_b64encode(
+        message.as_bytes()
+    ).decode()
+
+    resultat = service.users().messages().send(
+        userId="me",
+        body={
+            "raw": message_encode
+        }
+    ).execute()
+
+    print("📧 Mail envoyé :", resultat.get("id"))
+
+    return True

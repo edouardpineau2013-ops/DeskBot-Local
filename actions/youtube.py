@@ -1,6 +1,7 @@
 import requests
+import os
 
-CLE_API_YOUTUBE = "AIzaSyAs2rZLXgwZRZLVYAKYkMaXUKwSGicZ1II"
+CLE_API_YOUTUBE = os.environ.get("YOUTUBE_API_KEY", "")
 
 
 def obtenir_stats_chaine(identifiant, par_handle=True):

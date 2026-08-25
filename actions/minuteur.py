@@ -1,6 +1,7 @@
 import threading
 import time
-from audio.voix import parler, jouer_son, notifier_telephone
+
+from actions.notifications import notifier_telephone
 
 
 class Minuteur:
@@ -27,14 +28,21 @@ class Minuteur:
 
         self.depart = time.time()
         self.en_pause = False
-        self.timer = threading.Timer(self.duree, self._sonner)
+
+        self.timer = threading.Timer(
+            self.duree,
+            self._sonner
+        )
+
         self.timer.daemon = True
         self.timer.start()
+
         self.actif = True
 
         return True
 
     def demarrer_pomodoro(self):
+
         if self.actif:
             return False
 
@@ -49,6 +57,7 @@ class Minuteur:
             return False
 
         self.timer.cancel()
+
         self.restant_a_la_pause = self.temps_restant()
         self.en_pause = True
 
@@ -61,9 +70,15 @@ class Minuteur:
 
         self.depart = time.time()
         self.duree = self.restant_a_la_pause
-        self.timer = threading.Timer(self.duree, self._sonner)
+
+        self.timer = threading.Timer(
+            self.duree,
+            self._sonner
+        )
+
         self.timer.daemon = True
         self.timer.start()
+
         self.en_pause = False
 
         return True
@@ -77,23 +92,50 @@ class Minuteur:
             return int(self.restant_a_la_pause)
 
         ecoule = time.time() - self.depart
-        return max(0, int(self.duree - ecoule))
+
+        return max(
+            0,
+            int(self.duree - ecoule)
+        )
 
     def _sonner(self):
 
         self.actif = False
 
-        jouer_son("sonneries/minuteur.mp3")
+        # --------------------------------------------------
+        # SON LOCAL DU DESKBOT
+        # --------------------------------------------------
+        try:
+            from audio.voix import jouer_son
 
-        if self.mode_pomodoro and self.phase_pomodoro == "travail":
+            jouer_son("sonneries/minuteur.mp3")
 
-            parler(
+        except Exception as e:
+            print("🔊 Son du minuteur indisponible :", e)
+
+        # --------------------------------------------------
+        # POMODORO : FIN DU TRAVAIL
+        # --------------------------------------------------
+        if (
+            self.mode_pomodoro
+            and self.phase_pomodoro == "travail"
+        ):
+
+            message = (
                 "La session de travail est terminée. "
                 "Les 5 minutes de pause commencent."
             )
 
+            try:
+                from audio.voix import parler
+
+                parler(message)
+
+            except Exception as e:
+                print("🗣️ Voix indisponible :", e)
+
             notifier_telephone(
-                "⏰ DeskBot",
+                "DeskBot",
                 "Session terminée. Pause de 5 minutes."
             )
 
@@ -101,24 +143,49 @@ class Minuteur:
 
             self.demarrer(5, 0)
 
-        elif self.mode_pomodoro and self.phase_pomodoro == "pause":
+        # --------------------------------------------------
+        # POMODORO : FIN DE LA PAUSE
+        # --------------------------------------------------
+        elif (
+            self.mode_pomodoro
+            and self.phase_pomodoro == "pause"
+        ):
 
-            parler("Les 5 minutes de pause sont terminées.")
+            message = "Les 5 minutes de pause sont terminées."
+
+            try:
+                from audio.voix import parler
+
+                parler(message)
+
+            except Exception as e:
+                print("🗣️ Voix indisponible :", e)
 
             notifier_telephone(
-                "⏰ DeskBot",
+                "DeskBot",
                 "Les 5 minutes de pause sont terminées."
             )
 
             self.mode_pomodoro = False
             self.phase_pomodoro = None
 
+        # --------------------------------------------------
+        # MINUTEUR NORMAL
+        # --------------------------------------------------
         else:
 
-            parler("Le minuteur est terminé.")
+            message = "Le minuteur est terminé."
+
+            try:
+                from audio.voix import parler
+
+                parler(message)
+
+            except Exception as e:
+                print("🗣️ Voix indisponible :", e)
 
             notifier_telephone(
-                "⏰ DeskBot",
+                "DeskBot",
                 "Le minuteur est terminé."
             )
 
@@ -128,6 +195,7 @@ class Minuteur:
             return False
 
         self.timer.cancel()
+
         self.actif = False
         self.en_pause = False
 
