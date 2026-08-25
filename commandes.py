@@ -460,6 +460,17 @@ MOTS_DIMINUER_VOLUME = ["baisse", "diminue", "moins fort", "moins haut"]
 
 MOTS_CLES_MAIL = ["mail", "mails", "email", "emails", "courriel"]
 
+MOTS_CLES_ENVOI_MAIL = [
+    "envoie un mail",
+    "envoyer un mail",
+    "envoie un email",
+    "envoyer un email",
+    "écris un mail",
+    "ecris un mail",
+    "écrire un mail",
+    "ecrire un mail"
+]
+
 
 # =========================================================
 # RECHERCHE
@@ -1345,6 +1356,9 @@ def trouver_commande(texte):
     # =====================================================
     # 9. MAILS
     # =====================================================
+
+    if _contient_mot_cle(texte, MOTS_CLES_ENVOI_MAIL):
+        return "envoyer_mail"
 
     if _contient_mot_cle(texte, MOTS_CLES_MAIL):
         return "verifier_mails"

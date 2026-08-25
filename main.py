@@ -21,7 +21,7 @@ def parler_avec_etat(texte):
     try:
         parler(texte)
     finally:
-        definir_etat("attente")
+        definir_etat("connecté")
 
 parler_avec_etat("Bonjour. Je suis DeskBot. Dites 'DeskBot activé' pour m'activer.")
 
@@ -33,7 +33,7 @@ while True:
         fichier = enregistrer_phrase()
 
         if fichier is None:
-            definir_etat("attente")
+            definir_etat("connecté")
             continue
 
         definir_etat("reflexion")

@@ -11,7 +11,7 @@ from actions.minuteur import minuteur
 from actions.alarme import definir_alarme, supprimer_alarme_principale, prochaine_alarme, obtenir_alarme_principale, activer_desactiver_alarme, definir_sonnerie, SONNERIES_DISPONIBLES
 from commandes import trouver_commande, ALIAS_VILLES, extraire_url
 from actions.musique import jouer_musique, arreter_musique, pause_musique, volume_musique, augmenter_volume, diminuer_volume
-from actions.mail import etat_mails_non_lus
+from actions.mail import etat_mails_non_lus, envoyer_mail
 from actions.recherche import rechercher_paragraphe, rechercher_resultat
 from actions.youtube import obtenir_stats_chaine
 from actions.trajet import calculer_trajet
@@ -1135,10 +1135,174 @@ def extraire_numero_sonnerie(texte):
 def extraire_jours(texte):
     return [i for i, jour in enumerate(JOURS_SEMAINE) if jour in texte]
 
+# =========================================================
+# SESSION ENVOI DE MAIL
+# =========================================================
+
+session_mail = {
+    "active": False,
+    "etape": None,
+    "destinataire": None,
+    "sujet": None,
+    "contenu": None
+}
+
+
+def demarrer_session_mail():
+    session_mail["active"] = True
+    session_mail["etape"] = "destinataire"
+    session_mail["destinataire"] = None
+    session_mail["sujet"] = None
+    session_mail["contenu"] = None
+
+
+def arreter_session_mail():
+    session_mail["active"] = False
+    session_mail["etape"] = None
+    session_mail["destinataire"] = None
+    session_mail["sujet"] = None
+    session_mail["contenu"] = None
+
+
+def traiter_session_mail(texte):
+    texte = texte.strip()
+
+    if not texte:
+        return "Je n'ai pas compris."
+
+    # Annulation à n'importe quelle étape
+    if texte.lower() in [
+        "annule",
+        "annuler",
+        "stop",
+        "arrête",
+        "arrete",
+        "non"
+    ]:
+        arreter_session_mail()
+        return "Envoi du mail annulé."
+
+    # -----------------------------------------------------
+    # DESTINATAIRE
+    # -----------------------------------------------------
+
+    if session_mail["etape"] == "destinataire":
+        session_mail["destinataire"] = texte
+        session_mail["etape"] = "sujet"
+
+        return "Quel est le sujet du mail ?"
+
+    # -----------------------------------------------------
+    # SUJET
+    # -----------------------------------------------------
+
+    if session_mail["etape"] == "sujet":
+        session_mail["sujet"] = texte
+        session_mail["etape"] = "contenu"
+
+        return "Quel est le contenu du mail ?"
+
+    # -----------------------------------------------------
+    # CONTENU
+    # -----------------------------------------------------
+
+    if session_mail["etape"] == "contenu":
+        session_mail["contenu"] = texte
+        session_mail["etape"] = "confirmation"
+
+        return (
+            f"Je vais envoyer le mail à {session_mail['destinataire']} "
+            f"avec pour sujet « {session_mail['sujet']} ». "
+            "Voulez-vous confirmer l'envoi ?"
+        )
+
+    # -----------------------------------------------------
+    # CONFIRMATION
+    # -----------------------------------------------------
+
+    if session_mail["etape"] == "confirmation":
+
+        texte_confirmation = texte.lower().strip()
+
+        reponses_oui = [
+            "oui",
+            "ouais",
+            "ok",
+            "d'accord",
+            "dac",
+            "confirme",
+            "confirmer",
+            "je confirme",
+            "oui je confirme",
+            "oui envoie",
+            "envoie",
+            "vas-y",
+            "vas y"
+        ]
+
+        reponses_non = [
+            "non",
+            "annule",
+            "annuler",
+            "stop",
+            "ne l'envoie pas",
+            "n'envoie pas",
+            "pas maintenant"
+        ]
+
+        # Confirmation
+        if (
+            texte_confirmation in reponses_oui
+            or "oui" in texte_confirmation
+            or "confirme" in texte_confirmation
+        ):
+            try:
+                envoyer_mail(
+                    session_mail["destinataire"],
+                    session_mail["sujet"],
+                    session_mail["contenu"]
+                )
+
+                arreter_session_mail()
+
+                return "Mail envoyé avec succès."
+
+            except Exception as e:
+                print("❌ Erreur lors de l'envoi du mail :", e)
+
+                arreter_session_mail()
+
+                return "Je n'ai pas réussi à envoyer le mail."
+
+        # Annulation
+        if (
+            texte_confirmation in reponses_non
+            or "annule" in texte_confirmation
+            or "n'envoie pas" in texte_confirmation
+        ):
+            arreter_session_mail()
+            return "Envoi du mail annulé."
+
+        # Réponse incomprise
+        return "Je n'ai pas compris. Voulez-vous confirmer l'envoi du mail ?"
+
 def traiter_commande(texte):
 
     texte_original = texte.strip()
     texte = texte_original.lower()
+
+    # -----------------------------------------------------
+    # SESSION ENVOI DE MAIL
+    # -----------------------------------------------------
+
+    if session_mail["active"]:
+        print(
+            "📧 SESSION MAIL ACTIVE | étape :",
+            session_mail["etape"],
+            "| texte :",
+            texte_original
+        )
+        return traiter_session_mail(texte_original)
 
     if session_revision.active:
 
@@ -1365,6 +1529,10 @@ def traiter_commande(texte):
         m = (delta.seconds % 3600) // 60
         return f"La prochaine alarme sonne dans {h} heures et {m} minutes."
 
+    elif commande == "envoyer_mail":
+        demarrer_session_mail()
+        return "À qui voulez-vous envoyer le mail ?"
+
     elif commande == "verifier_mails":
         total, details = etat_mails_non_lus(max_details=5)
 
@@ -1372,10 +1540,18 @@ def traiter_commande(texte):
             return "Vous n'avez aucun mail non lu."
 
         phrases = [f"{expediteur} : {sujet}" for expediteur, sujet in details]
-        reponse = "Vous avez 1 mail non lu." if total == 1 else f"Vous avez {total} mails non lus."
+
+        reponse = (
+            "Vous avez 1 mail non lu."
+            if total == 1
+            else f"Vous avez {total} mails non lus."
+        )
 
         if total > len(details):
-            reponse += f" Voici les {len(details)} premiers : " + " ; ".join(phrases)
+            reponse += (
+                f" Voici les {len(details)} premiers : "
+                + " ; ".join(phrases)
+            )
         else:
             reponse += " " + " ; ".join(phrases)
 

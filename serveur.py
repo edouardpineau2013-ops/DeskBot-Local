@@ -1,9 +1,13 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import threading
 import os
 import logging
+import time
 from werkzeug.utils import secure_filename
+import io
+import tempfile
+import shutil
 from etat_deskbot import obtenir_etat, definir_etat, definir_reponse
 from actions.cours import importer_cours
 from audio.voix import parler
@@ -21,6 +25,12 @@ from actions.taches import (ajouter_tache, obtenir_taches)
 from actions.agenda import obtenir_evenements_mois
 from actions.notes import (charger_notes, creer_note, modifier_note, supprimer_note)
 from actions.ia import extraire_fichier_avec_gemini
+from actions.stl_gcode import convertir_stl_gcode
+from actions.compresseur import compresser_fichier, detecter_type
+from actions.convertisseur_fichier import convertir_fichier
+from actions.images import generer_image
+from actions.videos_youtube import (rechercher_videos, obtenir_video, obtenir_recommandations, rechercher_chaines, ajouter_abonnement, supprimer_abonnement, obtenir_abonnements, obtenir_dernieres_videos_abonnements)
+
 
 logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
@@ -29,6 +39,8 @@ CORS(app)
 
 lancer_gestionnaire()
 lancer_gestionnaire_mails()
+
+definir_etat("connecté")
 
 
 @app.route("/")
@@ -516,13 +528,787 @@ IMPORTANT :
         if os.path.exists(chemin_temp):
             os.remove(chemin_temp)
 
+@app.route("/stl-gcode", methods=["POST"])
+def stl_gcode():
+    try:
+        if "fichier" not in request.files:
+            return jsonify({
+                "erreur": "Aucun fichier STL envoyé."
+            }), 400
+
+        fichier = request.files["fichier"]
+
+        if not fichier.filename:
+            return jsonify({
+                "erreur": "Aucun fichier sélectionné."
+            }), 400
+
+        nom = secure_filename(fichier.filename)
+
+        if not nom.lower().endswith(".stl"):
+            return jsonify({
+                "erreur": "Le fichier doit être au format .stl"
+            }), 400
+
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory(
+            prefix="deskbot_stl_"
+        ) as temp_dir:
+
+            temp_dir = Path(temp_dir)
+
+            stl_temp = temp_dir / nom
+
+            fichier.save(stl_temp)
+
+            contenu_gcode = convertir_stl_gcode(
+                stl_temp
+            )
+
+            nom_gcode = Path(nom).stem + ".gcode"
+
+            return send_file(
+                contenu_gcode,
+                mimetype="text/plain",
+                headers={
+                    "Content-Disposition":
+                        f'attachment; filename="{nom_gcode}"'
+                }
+            )
+
+    except FileNotFoundError as e:
+        return jsonify({
+            "erreur": str(e)
+        }), 500
+
+    except ValueError as e:
+        return jsonify({
+            "erreur": str(e)
+        }), 400
+
+    except RuntimeError as e:
+        return jsonify({
+            "erreur": str(e)
+        }), 500
+
+    except Exception as e:
+        print("❌ Erreur STL → G-code :", e)
+
+        return jsonify({
+            "erreur":
+                "Une erreur est survenue pendant la conversion."
+        }), 500
+
+@app.route("/compresser", methods=["POST"])
+def compresser():
+    try:
+        if not acces_autorise():
+            return jsonify({
+                "succes": False,
+                "erreur": "Non autorisé"
+            }), 401
+
+        # =========================================================
+        # RÉCUPÉRATION DES FICHIERS
+        # =========================================================
+
+        fichiers = request.files.getlist("fichiers")
+
+        if not fichiers:
+            return jsonify({
+                "succes": False,
+                "erreur": "Aucun fichier envoyé."
+            }), 400
+
+        # Retirer les éventuels champs sans fichier
+        fichiers = [
+            fichier
+            for fichier in fichiers
+            if fichier and fichier.filename
+        ]
+
+        if not fichiers:
+            return jsonify({
+                "succes": False,
+                "erreur": "Aucun fichier sélectionné."
+            }), 400
+
+        # =========================================================
+        # IMPORTS
+        # =========================================================
+
+        import tempfile
+        import zipfile
+        from pathlib import Path
+
+        # =========================================================
+        # DOSSIER TEMPORAIRE
+        # =========================================================
+
+        with tempfile.TemporaryDirectory(
+            prefix="deskbot_compresseur_"
+        ) as temp_dir:
+
+            temp_dir = Path(temp_dir)
+
+            dossier_entree = temp_dir / "entree"
+            dossier_sortie = temp_dir / "sortie"
+
+            dossier_entree.mkdir()
+            dossier_sortie.mkdir()
+
+            fichiers_compresses = []
+
+            # =====================================================
+            # TRAITEMENT DE CHAQUE FICHIER
+            # =====================================================
+
+            for index, fichier in enumerate(fichiers):
+
+                nom = secure_filename(fichier.filename)
+
+                if not nom:
+                    continue
+
+                type_fichier = detecter_type(nom)
+
+                if type_fichier is None:
+                    return jsonify({
+                        "succes": False,
+                        "erreur": (
+                            f"Format non supporté pour "
+                            f"« {fichier.filename} ». "
+                            "Formats acceptés : "
+                            "JPG, JPEG, PNG, WEBP, BMP, TIFF, "
+                            "MP4, MOV, MKV, AVI, WEBM, M4V et PDF."
+                        )
+                    }), 400
+
+                # -------------------------------------------------
+                # Évite les conflits si plusieurs fichiers ont
+                # exactement le même nom
+                # -------------------------------------------------
+
+                nom_original = Path(nom)
+
+                nom_entree = nom
+
+                if (dossier_entree / nom_entree).exists():
+                    nom_entree = (
+                        f"{nom_original.stem}_"
+                        f"{index + 1}"
+                        f"{nom_original.suffix}"
+                    )
+
+                fichier_original = dossier_entree / nom_entree
+
+                # -------------------------------------------------
+                # Nom du fichier compressé
+                # -------------------------------------------------
+
+                fichier_compresse = (
+                    dossier_sortie /
+                    f"{Path(nom_entree).stem}_compressed"
+                    f"{Path(nom_entree).suffix}"
+                )
+
+                # -------------------------------------------------
+                # Sauvegarde
+                # -------------------------------------------------
+
+                fichier.save(fichier_original)
+
+                print(
+                    f"📦 Compression : {nom_entree} "
+                    f"({type_fichier})"
+                )
+
+                # -------------------------------------------------
+                # Compression
+                # -------------------------------------------------
+
+                resultat = compresser_fichier(
+                    fichier_original,
+                    fichier_compresse
+                )
+
+                print(
+                    f"✅ Compression terminée : "
+                    f"{resultat['taille_avant']} → "
+                    f"{resultat['taille_apres']} octets "
+                    f"({resultat['reduction']} %)"
+                )
+
+                fichiers_compresses.append({
+                    "fichier": fichier_compresse,
+                    "nom": fichier_compresse.name,
+                    "type": type_fichier,
+                    "taille_avant": resultat["taille_avant"],
+                    "taille_apres": resultat["taille_apres"],
+                    "reduction": resultat["reduction"]
+                })
+
+            # =====================================================
+            # VÉRIFICATION
+            # =====================================================
+
+            if not fichiers_compresses:
+                return jsonify({
+                    "succes": False,
+                    "erreur": "Aucun fichier n'a pu être compressé."
+                }), 400
+
+            # =====================================================
+            # CRÉATION DU ZIP
+            # =====================================================
+
+            zip_path = temp_dir / "fichiers_compresse.zip"
+
+            with zipfile.ZipFile(
+                zip_path,
+                "w",
+                compression=zipfile.ZIP_DEFLATED
+            ) as archive:
+
+                for element in fichiers_compresses:
+
+                    archive.write(
+                        element["fichier"],
+                        arcname=element["nom"]
+                    )
+
+            # =====================================================
+            # STATISTIQUES
+            # =====================================================
+
+            taille_avant_totale = sum(
+                element["taille_avant"]
+                for element in fichiers_compresses
+            )
+
+            taille_apres_totale = sum(
+                element["taille_apres"]
+                for element in fichiers_compresses
+            )
+
+            taille_zip = zip_path.stat().st_size
+
+            if taille_avant_totale > 0:
+                reduction_totale = round(
+                    (
+                        1 -
+                        (
+                            taille_apres_totale /
+                            taille_avant_totale
+                        )
+                    ) * 100,
+                    2
+                )
+            else:
+                reduction_totale = 0
+
+            print(
+                f"📦 ZIP créé : "
+                f"{len(fichiers_compresses)} fichier(s)"
+            )
+
+            print(
+                f"📊 Taille avant : "
+                f"{taille_avant_totale} octets"
+            )
+
+            print(
+                f"📊 Taille après compression : "
+                f"{taille_apres_totale} octets"
+            )
+
+            print(
+                f"📦 Taille du ZIP : "
+                f"{taille_zip} octets"
+            )
+
+            print(
+                f"📉 Réduction : "
+                f"{reduction_totale} %"
+            )
+
+            # =====================================================
+            # RETOUR DU ZIP
+            # =====================================================
+
+            return send_file(
+                zip_path.read_bytes(),
+                mimetype="application/zip",
+                headers={
+                    "Content-Disposition":
+                        'attachment; filename="fichiers_compresse.zip"',
+
+                    "X-Nombre-Fichiers":
+                        str(len(fichiers_compresses)),
+
+                    "X-Taille-Avant":
+                        str(taille_avant_totale),
+
+                    "X-Taille-Apres":
+                        str(taille_apres_totale),
+
+                    "X-Taille-Zip":
+                        str(taille_zip),
+
+                    "X-Reduction":
+                        str(reduction_totale)
+                }
+            )
+
+    # =============================================================
+    # ERREURS
+    # =============================================================
+
+    except ValueError as e:
+
+        return jsonify({
+            "succes": False,
+            "erreur": str(e)
+        }), 400
+
+    except RuntimeError as e:
+
+        print(
+            "❌ Erreur compresseur :",
+            e
+        )
+
+        return jsonify({
+            "succes": False,
+            "erreur": str(e)
+        }), 500
+
+    except Exception as e:
+
+        print(
+            "❌ Erreur compression :",
+            e
+        )
+
+        return jsonify({
+            "succes": False,
+            "erreur": (
+                "Une erreur est survenue "
+                "pendant la compression."
+            )
+        }), 500
+
+@app.route("/convertir", methods=["POST"])
+def convertir():
+    fichier = request.files.get("fichier")
+    format_cible = request.form.get("format")
+
+    if not fichier:
+        return jsonify({
+            "erreur": "Aucun fichier fourni."
+        }), 400
+
+    if not fichier.filename:
+        return jsonify({
+            "erreur": "Le fichier n'a pas de nom."
+        }), 400
+
+    if not format_cible:
+        return jsonify({
+            "erreur": "Aucun format de sortie fourni."
+        }), 400
+
+    dossier_temp = tempfile.mkdtemp(
+        prefix="deskbot_conversion_"
+    )
+
+    try:
+        nom_fichier = os.path.basename(
+            fichier.filename
+        )
+
+        chemin_entree = os.path.join(
+            dossier_temp,
+            nom_fichier
+        )
+
+        fichier.save(chemin_entree)
+
+        extension = format_cible.strip().lower()
+
+        if not extension.startswith("."):
+            extension = "." + extension
+
+        nom_sans_extension = os.path.splitext(
+            nom_fichier
+        )[0]
+
+        chemin_sortie = os.path.join(
+            dossier_temp,
+            nom_sans_extension + extension
+        )
+
+        convertir_fichier(
+            chemin_entree,
+            extension,
+            chemin_sortie
+        )
+
+        if not os.path.exists(chemin_sortie):
+            raise RuntimeError(
+                "Le fichier converti n'a pas été créé."
+            )
+
+        reponse = send_file(
+            chemin_sortie,
+            as_attachment=True,
+            download_name=os.path.basename(
+                chemin_sortie
+            )
+        )
+
+        @reponse.call_on_close
+        def nettoyer():
+            shutil.rmtree(
+                dossier_temp,
+                ignore_errors=True
+            )
+
+        return reponse
+
+    except Exception as e:
+
+        shutil.rmtree(
+            dossier_temp,
+            ignore_errors=True
+        )
+
+        print(
+            f"❌ Erreur conversion : {e}"
+        )
+
+        return jsonify({
+            "erreur": str(e)
+        }), 500
+
+# ---------------------------------------------------------
+# GÉNÉRATION D'IMAGE
+# ---------------------------------------------------------
+
+@app.route("/generer-image", methods=["POST"])
+def generer_image_route():
+
+    if not acces_autorise():
+        return jsonify({
+            "succes": False,
+            "erreur": "Non autorisé"
+        }), 401
+
+    donnees = request.json or {}
+
+    prompt = donnees.get("prompt", "").strip()
+    format_image = donnees.get("format", "1:1")
+    qualite = donnees.get("qualite", "moyenne")
+
+    if not prompt:
+        return jsonify({
+            "succes": False,
+            "erreur": "Le prompt est requis."
+        }), 400
+
+    try:
+        chemin_image = generer_image(
+            prompt,
+            format_image=format_image,
+            qualite=qualite
+        )
+
+        if not chemin_image or not os.path.exists(chemin_image):
+            return jsonify({
+                "succes": False,
+                "erreur": "L'image n'a pas été générée."
+            }), 500
+
+        reponse = send_file(
+            chemin_image,
+            mimetype="image/jpeg",
+            as_attachment=False,
+            download_name="deskbot_image.jpg"
+        )
+
+        @reponse.call_on_close
+        def nettoyer():
+            try:
+                if os.path.exists(chemin_image):
+                    os.remove(chemin_image)
+            except Exception as e:
+                print(
+                    "⚠️ Impossible de supprimer "
+                    "l'image temporaire :", e
+                )
+
+        return reponse
+
+    except Exception as e:
+        print(
+            "❌ Erreur génération image :",
+            e
+        )
+
+        return jsonify({
+            "succes": False,
+            "erreur": str(e)
+        }), 500
+
+# =========================================================
+# YOUTUBE
+# =========================================================
+
+@app.get("/youtube/recommandations")
+def youtube_recommandations():
+
+    try:
+
+        nombre = request.args.get(
+            "nombre",
+            40,
+            type=int
+        )
+
+        videos = obtenir_recommandations(
+            nombre
+        )
+
+        return jsonify({
+            "success": True,
+            "videos": videos
+        })
+
+    except Exception as e:
+
+        print(
+            f"❌ YouTube recommandations : {e}"
+        )
+
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.get("/youtube/abonnements-videos")
+def youtube_abonnements_videos():
+
+    try:
+
+        nombre = request.args.get(
+            "nombre",
+            40,
+            type=int
+        )
+
+        videos = obtenir_dernieres_videos_abonnements(
+            nombre
+        )
+
+        return jsonify({
+            "success": True,
+            "videos": videos
+        })
+
+    except Exception as e:
+
+        print(
+            f"❌ YouTube abonnements : {e}"
+        )
+
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.get("/youtube/rechercher")
+def youtube_rechercher():
+
+    recherche = request.args.get(
+        "q",
+        "",
+        type=str
+    )
+
+    if not recherche.strip():
+
+        return jsonify({
+            "success": False,
+            "error": "Recherche vide."
+        }), 400
+
+    try:
+
+        videos = rechercher_videos(
+            recherche,
+            40
+        )
+
+        return jsonify({
+            "success": True,
+            "videos": videos
+        })
+
+    except Exception as e:
+
+        print(f"❌ YouTube recherche : {e}")
+
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.get("/youtube/video/<video_id>")
+def youtube_video(video_id):
+
+    try:
+
+        video = obtenir_video(video_id)
+
+        if not video:
+
+            return jsonify({
+                "success": False,
+                "error": "Vidéo introuvable."
+            }), 404
+
+        return jsonify({
+            "success": True,
+            "video": video
+        })
+
+    except Exception as e:
+
+        print(f"❌ YouTube vidéo : {e}")
+
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.get("/youtube/chaines")
+def youtube_chaines():
+
+    recherche = request.args.get(
+        "q",
+        "",
+        type=str
+    )
+
+    if not recherche.strip():
+
+        return jsonify({
+            "success": False,
+            "error": "Recherche vide."
+        }), 400
+
+    try:
+
+        chaines = rechercher_chaines(
+            recherche,
+            12
+        )
+
+        return jsonify({
+            "success": True,
+            "chaines": chaines
+        })
+
+    except Exception as e:
+
+        print(f"❌ YouTube chaînes : {e}")
+
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.get("/youtube/abonnements")
+def youtube_abonnements():
+
+    try:
+
+        return jsonify({
+            "success": True,
+            "abonnements": obtenir_abonnements()
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.post("/youtube/abonner")
+def youtube_abonner():
+
+    donnees = request.get_json(silent=True) or {}
+
+    channel_id = donnees.get("channel_id")
+    nom = donnees.get("nom")
+
+    if not channel_id:
+
+        return jsonify({
+            "success": False,
+            "error": "channel_id manquant."
+        }), 400
+
+    success = ajouter_abonnement(
+        channel_id,
+        nom
+    )
+
+    return jsonify({
+        "success": success
+    })
+
+
+@app.post("/youtube/desabonner")
+def youtube_desabonner():
+
+    donnees = request.get_json(silent=True) or {}
+
+    channel_id = donnees.get("channel_id")
+
+    if not channel_id:
+
+        return jsonify({
+            "success": False,
+            "error": "channel_id manquant."
+        }), 400
+
+    success = supprimer_abonnement(
+        channel_id
+    )
+
+    return jsonify({
+        "success": success
+    })
+
+
+
 def parler_serveur(texte):
     definir_etat("parle")
 
     try:
         parler(texte)
     finally:
-        definir_etat("attente")
+        definir_etat("connecté")
 
 @app.route("/commande", methods=["POST"])
 def commande():
