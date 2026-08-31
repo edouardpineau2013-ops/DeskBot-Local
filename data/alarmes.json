@@ -1,3 +1,13 @@
 {
-    "alarmes": []
+    "alarmes": [
+        {
+            "heure": 16,
+            "minute": 0,
+            "active": true,
+            "jours": [
+                6
+            ],
+            "sonnerie": "sonneries/alarme 1.mp3"
+        }
+    ]
 }

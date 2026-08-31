@@ -2,6 +2,7 @@ from rapidfuzz import process, fuzz
 import re
 from datetime import datetime, timedelta
 from villes import VILLES
+from actions.dernier_recours_commande import reconnaitre_commande_avec_groq
 from actions.heure import heure
 from actions.calcul import calculer
 from actions.systeme import executer
@@ -2253,4 +2254,614 @@ def traiter_commande(texte):
     if reponse:
         return reponse
 
+    # =====================================================
+    # DERNIER RECOURS : GROQ
+    # =====================================================
+
+    resultat_groq = executer_commande_groq(texte)
+
+    if resultat_groq is not None:
+        return resultat_groq
+
     return "Je n'ai pas compris."
+
+def executer_commande_groq(texte):
+    """
+    Dernier recours :
+    utilise Groq pour comprendre une commande qui n'a pas été
+    reconnue par le système classique.
+
+    Groq doit retourner :
+    commande: "nom"; parametre: "valeur";
+    "content": (
+    "..."
+    ),
+    """
+
+    reponse_groq = reconnaitre_commande_avec_groq(texte)
+
+    if not reponse_groq:
+        return None
+
+    print("Réponse Groq :", reponse_groq)
+
+    # =====================================================
+    # EXTRACTION DE LA COMMANDE
+    # =====================================================
+
+    match_commande = re.search(
+        r'commande:\s*"([^"]+)"',
+        reponse_groq,
+        re.IGNORECASE
+    )
+
+    if not match_commande:
+        return None
+
+    commande = match_commande.group(1).strip()
+
+    if commande == "undefined":
+        return None
+
+    # =====================================================
+    # EXTRACTION DES PARAMÈTRES
+    # =====================================================
+
+    def parametre(nom):
+        match = re.search(
+            rf'{re.escape(nom)}:\s*"([^"]*)"',
+            reponse_groq,
+            re.IGNORECASE
+        )
+
+        if not match:
+            return None
+
+        valeur = match.group(1).strip()
+
+        if valeur.lower() == "undefined":
+            return None
+
+        return valeur
+
+    # =====================================================
+    # COMMANDES SIMPLES
+    # =====================================================
+
+    if commande == "youtube":
+        return executer("youtube")
+
+    if commande == "google":
+        return executer("google")
+
+    if commande == "bonjour":
+        return "Bonjour !"
+
+    if commande == "merci":
+        return "Avec plaisir !"
+
+    if commande == "ça_va":
+        return "Je vais très bien."
+
+    if commande == "qui_es_tu":
+        return "Je suis DeskBot, votre assistant personnel."
+
+    if commande == "heure":
+        return heure()
+
+    # =====================================================
+    # MÉTÉO
+    # =====================================================
+
+    if commande == "meteo":
+
+        ville = parametre("ville")
+        date = parametre("date")
+
+        if ville is None:
+            return "Je n'ai pas compris quelle ville tu veux."
+
+        if date is None:
+            return meteo(ville)
+
+        try:
+            date_obj = datetime.strptime(date, "%d/%m/%Y")
+            aujourd_hui = datetime.now().date()
+            jour_offset = (date_obj.date() - aujourd_hui).days
+
+            return meteo(ville, jour_offset)
+
+        except ValueError:
+            return "Je n'ai pas compris la date."
+
+    # =====================================================
+    # TRAJET
+    # =====================================================
+
+    if commande == "calculer_trajet":
+
+        depart = parametre("depart")
+        arrivee = parametre("arrivee")
+        mode = parametre("mode")
+
+        if depart is None:
+            return "Je n'ai pas compris le départ du trajet."
+
+        if arrivee is None:
+            return "Je n'ai pas compris l'arrivée du trajet."
+
+        if mode is None:
+            return "Je n'ai pas compris le moyen de transport."
+
+        # Sécurité supplémentaire
+        modes = {
+            "voiture": "voiture",
+            "velo": "velo",
+            "vélo": "velo",
+            "pied": "pied"
+        }
+
+        mode = modes.get(mode.lower())
+
+        if mode is None:
+            return "Je n'ai pas compris le moyen de transport."
+
+        resultat = calculer_trajet(
+            depart,
+            arrivee,
+            mode
+        )
+
+        if resultat is None:
+            return "Je n'ai pas réussi à calculer ce trajet."
+
+        distance_km, duree_minutes = resultat
+        duree_texte = formater_duree(duree_minutes)
+
+        return (
+            f"Le trajet de {depart} à {arrivee} fait "
+            f"{distance_km:.1f} kilomètres, "
+            f"soit environ {duree_texte} {mode}."
+        )
+
+    # =====================================================
+    # CALCUL
+    # =====================================================
+
+    if commande == "calculer":
+
+        expression = parametre("expression")
+
+        if expression is None:
+            return "Je n'ai pas compris le calcul."
+
+        return calculer(expression)
+
+    # =====================================================
+    # RECHERCHE GOOGLE
+    # =====================================================
+
+    if commande == "recherche_google":
+
+        recherche = parametre("recherche")
+
+        if recherche is None:
+            return "Je n'ai pas compris ce que tu veux rechercher."
+
+        return rechercher_resultat(recherche)
+
+    # =====================================================
+    # MUSIQUE
+    # =====================================================
+
+    if commande == "musique":
+
+        musique = parametre("musique")
+
+        if musique is None:
+            return "Je n'ai pas compris quelle musique jouer."
+
+        return jouer_musique(musique)
+
+    if commande == "pause_musique":
+        return pause_musique()
+
+    if commande == "stop_musique":
+        return arreter_musique()
+
+    if commande == "augmenter_volume":
+
+        valeur = parametre("valeur")
+
+        if valeur is None:
+            return "Je n'ai pas compris le volume demandé."
+
+        return augmenter_volume(valeur)
+
+    if commande == "diminuer_volume":
+
+        valeur = parametre("valeur")
+
+        if valeur is None:
+            return "Je n'ai pas compris le volume demandé."
+
+        return diminuer_volume(valeur)
+
+    # =====================================================
+    # YOUTUBE
+    # =====================================================
+
+    if commande == "statistiques_youtube":
+
+        chaine = parametre("chaine")
+
+        if chaine is None:
+            return "Je n'ai pas compris quelle chaîne rechercher."
+
+        return obtenir_stats_chaine(chaine)
+
+    # =====================================================
+    # MINUTEUR
+    # =====================================================
+
+    if commande == "demarrer_minuteur":
+
+        duree = parametre("duree")
+
+        if duree is None:
+            return "Je n'ai pas compris la durée du minuteur."
+
+        return minuteur(duree)
+
+    if commande == "pause_minuteur":
+        return minuteur.pause()
+
+    if commande == "reprendre_minuteur":
+        return minuteur.reprendre()
+
+    if commande == "temps_restant_minuteur":
+        if not minuteur.actif:
+            return "Aucun minuteur en cours."
+
+        secondes = minuteur.temps_restant()
+
+        return (
+            f"Il reste {secondes // 60} minutes "
+            f"et {secondes % 60} secondes."
+        )
+
+    if commande == "arreter_minuteur":
+        return minuteur.arreter()
+
+    # =====================================================
+    # RÉPÉTER
+    # =====================================================
+
+    if commande == "repeter":
+
+        texte_a_repeter = parametre("texte")
+
+        if texte_a_repeter is None:
+            return "Je n'ai pas compris quoi répéter."
+
+        return texte_a_repeter
+
+    # =====================================================
+    # QUESTION IA
+    # =====================================================
+
+    if commande == "question_ia":
+
+        question = parametre("question")
+
+        if question is None:
+            return "Je n'ai pas compris la question."
+
+        return generer_reponse_avec_groq(question)
+
+    # =====================================================
+    # TRADUCTION
+    # =====================================================
+
+    if commande == "traduire":
+
+        langue = parametre("langue")
+        texte_a_traduire = parametre("texte")
+
+        if langue is None or texte_a_traduire is None:
+            return "Je n'ai pas compris le texte ou la langue."
+
+        return traiter_traduction(
+            texte_a_traduire,
+            langue
+        )
+
+    # =====================================================
+    # CONVERSION
+    # =====================================================
+
+    if commande == "convertir":
+
+        valeur = parametre("valeur")
+        unite_depart = parametre("unite_depart")
+        unite_arrivee = parametre("unite_arrivee")
+
+        if (
+            valeur is None
+            or unite_depart is None
+            or unite_arrivee is None
+        ):
+            return "Je n'ai pas compris la conversion."
+
+        return convertir(
+            valeur,
+            unite_depart,
+            unite_arrivee
+        )
+
+    # =====================================================
+    # TO-DO
+    # =====================================================
+
+    if commande == "ajouter_tache":
+
+        tache = parametre("tache")
+        date = parametre("date")
+
+        if tache is None:
+            return "Je n'ai pas compris la tâche."
+
+        return ajouter_tache(tache, date)
+
+    if commande == "afficher_taches":
+        return obtenir_taches()
+
+    if commande == "terminer_tache":
+
+        tache = parametre("tache")
+
+        if tache is None:
+            return "Je n'ai pas compris quelle tâche terminer."
+
+        return terminer_tache(tache)
+
+    if commande == "annuler_tache":
+
+        tache = parametre("tache")
+
+        if tache is None:
+            return "Je n'ai pas compris quelle tâche annuler."
+
+        return annuler_tache(tache)
+
+    if commande == "supprimer_tache":
+
+        tache = parametre("tache")
+
+        if tache is None:
+            return "Je n'ai pas compris quelle tâche supprimer."
+
+        return supprimer_tache(tache)
+
+    if commande == "vider_taches":
+        return vider_taches()
+
+    if commande == "supprimer_taches_terminees":
+        return supprimer_taches_terminees()
+
+    # =====================================================
+    # AGENDA
+    # =====================================================
+
+    if commande == "ajouter_evenement":
+
+        titre = parametre("titre")
+        date = parametre("date")
+        heure_evenement = parametre("heure")
+
+        if titre is None or date is None or heure_evenement is None:
+            return "Je n'ai pas compris toutes les informations de l'événement."
+
+        return ajouter_evenement(
+            titre,
+            date,
+            heure_evenement
+        )
+
+    if commande == "afficher_agenda":
+
+        date = parametre("date")
+
+        if date is None:
+            return "Je n'ai pas compris la date."
+
+        return obtenir_evenements(date)
+
+    if commande == "prochains_evenements":
+        return prochains_evenements()
+
+    if commande == "supprimer_evenement":
+
+        titre = parametre("titre")
+        date = parametre("date")
+        heure_evenement = parametre("heure")
+
+        if titre is None or date is None or heure_evenement is None:
+            return "Je n'ai pas compris toutes les informations de l'événement."
+
+        return supprimer_evenement(
+            titre,
+            date,
+            heure_evenement
+        )
+
+    if commande == "modifier_evenement":
+
+        titre = parametre("titre")
+        date = parametre("date")
+        heure_evenement = parametre("heure")
+
+        if titre is None or date is None or heure_evenement is None:
+            return "Je n'ai pas compris toutes les informations de l'événement."
+
+        return modifier_evenement(
+            titre,
+            date,
+            heure_evenement
+        )
+
+    if commande == "ajouter_evenement_url":
+
+        url = parametre("url")
+
+        if url is None:
+            return "Je n'ai pas compris l'URL."
+
+        return ajouter_evenement_depuis_url(url)
+
+    # =====================================================
+    # NOTES
+    # =====================================================
+
+    if commande == "creer_note":
+
+        nom = parametre("nom")
+
+        if nom is None:
+            return "Je n'ai pas compris le nom de la note."
+
+        return creer_note(nom)
+
+    if commande == "ajouter_note":
+
+        nom = parametre("nom")
+        contenu = parametre("contenu")
+
+        if nom is None or contenu is None:
+            return "Je n'ai pas compris la note ou son contenu."
+
+        return ajouter_texte(nom, contenu)
+
+    if commande == "lire_note":
+
+        nom = parametre("nom")
+
+        if nom is None:
+            return "Je n'ai pas compris quelle note lire."
+
+        return lire_note(nom)
+
+    if commande == "modifier_note":
+
+        nom = parametre("nom")
+        contenu = parametre("contenu")
+
+        if nom is None or contenu is None:
+            return "Je n'ai pas compris la note ou son contenu."
+
+        return modifier_note(nom, contenu)
+
+    if commande == "supprimer_note":
+
+        nom = parametre("nom")
+
+        if nom is None:
+            return "Je n'ai pas compris quelle note supprimer."
+
+        return supprimer_note(nom)
+
+    if commande == "vider_note":
+
+        nom = parametre("nom")
+
+        if nom is None:
+            return "Je n'ai pas compris quelle note vider."
+
+        return vider_note(nom)
+
+    if commande == "renommer_note":
+
+        ancien_nom = parametre("ancien_nom")
+        nouveau_nom = parametre("nouveau_nom")
+
+        if ancien_nom is None or nouveau_nom is None:
+            return "Je n'ai pas compris les noms des notes."
+
+        return renommer_note(
+            ancien_nom,
+            nouveau_nom
+        )
+
+    if commande == "lister_notes":
+        return lister_notes()
+
+    if commande == "rechercher_notes":
+
+        recherche = parametre("recherche")
+
+        if recherche is None:
+            return "Je n'ai pas compris ce que rechercher."
+
+        return rechercher_notes(recherche)
+
+    # =====================================================
+    # HASARD
+    # =====================================================
+
+    if commande == "pile_ou_face":
+        return pile_ou_face()
+
+    if commande == "lancer_de":
+        return lancer_de()
+
+    if commande == "nombre_aleatoire":
+
+        minimum = parametre("minimum")
+        maximum = parametre("maximum")
+
+        if minimum is None or maximum is None:
+            return "Je n'ai pas compris les limites du nombre."
+
+        return nombre_aleatoire(
+            int(minimum),
+            int(maximum)
+        )
+
+    if commande == "choix_aleatoire":
+
+        choix = parametre("choix")
+
+        if choix is None:
+            return "Je n'ai pas compris les choix."
+
+        return choix_aleatoire(choix)
+
+    # =====================================================
+    # DOCUMENTS
+    # =====================================================
+
+    if commande == "resumer_document":
+
+        document = parametre("document")
+
+        if document is None:
+            return "Je n'ai pas compris le document."
+
+        return resumer_avec_groq(document)
+
+    if commande == "corriger_texte":
+
+        texte_a_corriger = parametre("texte")
+
+        if texte_a_corriger is None:
+            return "Je n'ai pas compris le texte à corriger."
+
+        return corriger_texte(texte_a_corriger)
+
+    # =====================================================
+    # COMMANDE INCONNUE
+    # =====================================================
+
+    print("Commande Groq non gérée :", commande)
+
+    return None

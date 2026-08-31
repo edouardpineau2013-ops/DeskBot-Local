@@ -3,7 +3,6 @@ import unicodedata
 from rapidfuzz import fuzz, process
 from villes import VILLES
 
-
 # =========================================================
 # NORMALISATION
 # =========================================================

@@ -17,7 +17,7 @@ from actions.minuteur import minuteur
 from actions.alarme import obtenir_alarme_principale, prochaine_alarme
 from auth import verifier_mot_de_passe, generer_token, token_valide
 from actions.temps import lancer_gestionnaire
-from actions.mail import lancer_gestionnaire_mails, etat_mails_non_lus
+from actions.mail import lancer_gestionnaire_mails, etat_mails_non_lus, envoyer_mail
 from actions.profil_revision import charger_profil, ouvrir_boite_mystere, calculer_rarete_profs
 from actions.cours import slugifier
 from actions.revision import (generer_questions, session_revision)
@@ -30,6 +30,7 @@ from actions.compresseur import compresser_fichier, detecter_type
 from actions.convertisseur_fichier import convertir_fichier
 from actions.images import generer_image
 from actions.videos_youtube import (rechercher_videos, obtenir_video, obtenir_recommandations, rechercher_chaines, ajouter_abonnement, supprimer_abonnement, obtenir_abonnements, obtenir_dernieres_videos_abonnements)
+from actions.mots_de_passes import generer_mot_de_passe
 
 
 logging.getLogger("werkzeug").setLevel(logging.ERROR)
@@ -130,8 +131,40 @@ def afficher_mails():
         "mails": mails
     })
 
+@app.route("/mails/envoyer", methods=["POST"])
+def route_envoyer_mail():
+
+    if not acces_autorise():
+        return jsonify({"erreur": "Non autorisé"}), 401
+
+    donnees = request.get_json()
+
+    if not donnees:
+        return jsonify({
+            "erreur": "Données manquantes."
+        }), 400
+
+    destinataire = donnees.get("destinataire", "").strip()
+    objet = donnees.get("objet", "").strip()
+    contenu = donnees.get("contenu", "").strip()
+
+    if not destinataire or not objet or not contenu:
+        return jsonify({
+            "erreur": "Tous les champs sont obligatoires."
+        }), 400
+
+    envoyer_mail(destinataire, objet, contenu)
+
+    return jsonify({
+        "message": "Mail envoyé !"
+    })
+
 @app.route("/cours/importer", methods=["POST"])
 def importer_cours_route():
+
+    print("=== ENVOI MAIL ===")
+    print("Authorization :", request.headers.get("Authorization"))
+    print("Token local :", request.headers.get("Authorization", "").replace("Bearer ", ""))
 
     if not acces_autorise():
         return jsonify({"erreur": "Non autorisé"}), 401
@@ -1298,6 +1331,38 @@ def youtube_desabonner():
 
     return jsonify({
         "success": success
+    })
+
+@app.route("/mots-de-passes", methods=["POST"])
+def mots_de_passes():
+    if not acces_autorise():
+        return jsonify({"erreur": "Non autorisé"}), 401
+
+    donnees = request.get_json()
+    if not donnees:
+        return jsonify({"erreur": "Données manquantes."}), 400
+
+    try:
+        longueur = int(donnees.get("longueur", 16))
+        
+        majuscules = bool(donnees.get("majuscules", True))
+        minuscules = bool(donnees.get("minuscules", True))
+        chiffres = bool(donnees.get("chiffres", True))
+        symboles = bool(donnees.get("symboles", False))
+        exclure_ambigus = bool(donnees.get("exclure_ambigus", False))
+        
+    except (ValueError, TypeError):
+        return jsonify({"erreur": "Format des paramètres invalide."}), 400
+
+    try:
+        mot_de_passe = generer_mot_de_passe(
+            longueur, majuscules, minuscules, chiffres, symboles, exclure_ambigus
+        )
+    except Exception as e:
+        return jsonify({"erreur": f"Erreur de génération : {str(e)}"}), 500
+
+    return jsonify({
+        "mot_de_passe": mot_de_passe
     })
 
 
