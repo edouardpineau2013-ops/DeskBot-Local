@@ -45,22 +45,55 @@ def jouer_musique(texte):
     url = MUSIQUES[nom]
 
     ydl_opts = {
-        "format": "bestaudio",
+        "format": "bestaudio/best",
         "quiet": True,
+        "noplaylist": True,
     }
 
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
-        audio_url = info["url"]
+
+    audio_url = info["url"]
+
+
+    # =========================================================
+    # ARRÊT DE LA MUSIQUE ACTUELLE
+    # =========================================================
 
     if player is not None:
         player.stop()
 
-    instance = vlc.Instance("--no-video")
-    media = instance.media_new(audio_url)
+
+    # =========================================================
+    # VLC
+    # =========================================================
+
+    instance = vlc.Instance(
+        "--no-video"
+    )
+
+    media = instance.media_new(
+        audio_url
+    )
+
+    # Donner à VLC les informations HTTP nécessaires
+    media.add_option(
+        ":http-referrer=https://www.youtube.com/"
+    )
+
+    media.add_option(
+        ":http-user-agent=" + ydl.params.get(
+            "http_headers", {}
+        ).get(
+            "User-Agent",
+            "Mozilla/5.0"
+        )
+    )
 
     player = instance.media_player_new()
+
     player.set_media(media)
+
     player.play()
 
     return f"Je lance {nom}."
