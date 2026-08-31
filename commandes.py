@@ -1317,10 +1317,10 @@ def trouver_commande(texte):
     if _contient_mot_cle(texte, MOTS_CLES_METEO):
         return "meteo"
 
-    if _ville_par_alias(texte):
-        return "meteo"
-
-    if _ville_apres_a(texte):
+    if _ville_par_alias(texte) and _contient_mot_cle(
+        texte,
+        MOTS_CLES_METEO
+    ):
         return "meteo"
 
     # =====================================================
@@ -1732,19 +1732,10 @@ def trouver_commande(texte):
     # COMMANDES SIMPLES CLASSIQUES
     # =====================================================
 
-    commande = _meilleure_commande(texte, COMMANDES)
-
-    if commande:
-        return commande
-
-    # =====================================================
-    # DERNIER RECOURS : MUSIQUE
-    # =====================================================
-
     commande = _meilleure_commande(
         texte,
-        {"musique": COMMANDES_MUSIQUE["musique"]},
-        seuil=85
+        COMMANDES,
+        seuil=90
     )
 
     if commande:

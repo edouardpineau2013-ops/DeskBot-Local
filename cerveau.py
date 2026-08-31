@@ -1287,6 +1287,60 @@ def traiter_session_mail(texte):
         # Réponse incomprise
         return "Je n'ai pas compris. Voulez-vous confirmer l'envoi du mail ?"
 
+def essayer_groq_si_extraction_echoue(texte, commande):
+    """
+    Utilise Groq uniquement lorsqu'une commande classique
+    a été reconnue mais que ses paramètres ne peuvent pas
+    être correctement extraits.
+    """
+
+    commandes_avec_parametres = {
+        "calculer_trajet",
+        "meteo",
+        "calculer",
+        "convertir",
+        "traduire",
+        "recherche_paragraphe",
+        "recherche_resultat",
+        "stats_youtube",
+        "demarrer_minuteur",
+        "ajouter_todo",
+        "terminer_todo",
+        "supprimer_todo",
+        "ajouter_note",
+        "lire_note",
+        "modifier_note",
+        "supprimer_note",
+        "vider_note",
+        "renommer_note",
+        "rechercher_notes",
+        "ajouter_agenda",
+        "afficher_agenda",
+        "supprimer_agenda",
+        "modifier_agenda",
+        "notification",
+        "repeter",
+        "question_ia",
+        "musique",
+        "augmenter_volume",
+        "diminuer_volume",
+    }
+
+    if commande not in commandes_avec_parametres:
+        return None
+
+    print(
+        f"⚠️ Extraction classique impossible pour "
+        f"'{commande}', recours à Groq."
+    )
+
+    resultat = executer_commande_groq(texte)
+
+    if resultat is not None:
+        return resultat
+
+    return None
+
 def traiter_commande(texte):
 
     texte_original = texte.strip()
@@ -1336,11 +1390,15 @@ def traiter_commande(texte):
     commande = trouver_commande(texte)
 
     print("Commande reconnue :", commande)
-    
-    commande = trouver_commande(texte)
-
     print("Texte :", texte)
-    print("Commande :", commande)
+
+    if commande is None:
+        resultat_groq = executer_commande_groq(texte)
+
+        if resultat_groq is not None:
+            return resultat_groq
+
+        return "Je n'ai pas compris."
 
     if commande == "bonjour":
         return "Bonjour !"
@@ -2253,15 +2311,6 @@ def traiter_commande(texte):
 
     if reponse:
         return reponse
-
-    # =====================================================
-    # DERNIER RECOURS : GROQ
-    # =====================================================
-
-    resultat_groq = executer_commande_groq(texte)
-
-    if resultat_groq is not None:
-        return resultat_groq
 
     return "Je n'ai pas compris."
 
